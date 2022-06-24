@@ -1,7 +1,86 @@
 ---
-title: "mmsProject1"
+title: "Using the PokeAPI"
 author: "Maxwell Marion-Spencer"
-date: '2022-06-19'
+date: '2022-06-18'
 output: html_document
 ---
+
+---- ACTUAL REPORT SECTION ----
+
+## Requirements
+
+List of requirements:
+
+- `tidyverse`
+- `httr`
+- `jsonlite`
+
+## Functions
+
+---> 0. Pokemon - Pulls in weight, height, type and base stats (hp, attack,
+defense, special attack, special defense, speed)
+
+---> 1. Habitat - Asks for habitat as an argument, returns a data frame of
+the habitat name as the column name, and all pokemon that can be found in that
+habitat as the rows
+
+---> 2. Color - Asks for color as an argument, returns a data frame of
+the habitat name as the column name, and all pokemon that can be found in that
+habitat as the rows
+
+---> 3. Berry - Requests a berry name, returns growth_time, max_harvest, size,
+smoothness, soil_dryness, firmness (?), and flavor (?)
+
+
+## Exploratory Data Analysis
+
+## Conclusion
+
+---- ACTUAL REPORT SECTION ----
+
+```{r}
+#install.packages("jsonlite")
+#install.packages("httr")
+
+library(jsonlite)
+library(httr)
+
+# Format for queries
+#  https://pokeapi.co/api/v2/
+
+# Example query that pulls down a list of all pokemon
+#  https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0
+```
+
+```{r}
+# Submitting test GET request
+all_poke <- GET('https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0')
+
+all_poke_parsed <- fromJSON(rawToChar(all_poke$content))
+str(all_poke_parsed, max.level = 1)
+```
+
+```{r}
+all_poke_parsed <- as.data.frame(all_poke_parsed$results)
+```
+
+```{r}
+# Testing pulling info for a single pokemon
+bulbq <- GET('https://pokeapi.co/api/v2/pokemon/1')
+bulbq_parsed <- fromJSON(rawToChar(bulbq$content))
+```
+
+```{r}
+all_poke_parsed
+def 
+```
+
+```{r}
+color_q <- GET('https://pokeapi.co/api/v2/pokemon-color/red')
+color_parsed <- fromJSON(rawToChar(color_q$content))
+```
+
+```{r}
+color_parsed$pokemon_species$name
+```
 
