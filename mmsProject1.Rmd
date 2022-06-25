@@ -7,7 +7,7 @@ output: html_document
 
 ---- ACTUAL REPORT SECTION ----
 
-## Requirements
+# Requirements
 
 List of requirements:
 
@@ -15,89 +15,16 @@ List of requirements:
 - `httr`
 - `jsonlite`
 
-## Functions
-
----> 0. Pokemon - Pulls in weight, height, type and base stats (hp, attack,
-defense, special attack, special defense, speed)
-
----> 1. Habitat - Asks for habitat as an argument, returns a data frame of
-the habitat name as the column name, and all pokemon that can be found in that
-habitat as the rows
-
----> 2. Color - Asks for color as an argument, returns a data frame of
-the habitat name as the column name, and all pokemon that can be found in that
-habitat as the rows
-
----> 3. Berry - Requests a berry name, returns growth_time, max_harvest, size,
-smoothness, soil_dryness, firmness (?), and flavor (?)
-
-
-## Exploratory Data Analysis
-
-## Conclusion
-
----- ACTUAL REPORT SECTION ----
+# Functions
 
 ```{r}
 #install.packages("jsonlite")
 #install.packages("httr")
 
+library(tidyverse)
 library(jsonlite)
 library(httr)
-
-# Format for queries
-#  https://pokeapi.co/api/v2/
-
-# Example query that pulls down a list of all pokemon
-#  https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0
 ```
-
-```{r}
-# Submitting test GET request
-all_poke <- GET('https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0')
-
-all_poke_parsed <- fromJSON(rawToChar(all_poke$content))
-str(all_poke_parsed, max.level = 1)
-```
-
-```{r}
-all_poke_parsed <- as.data.frame(all_poke_parsed$results)
-```
-
-```{r}
-# Testing pulling info for a single pokemon
-bulbq <- GET('https://pokeapi.co/api/v2/pokemon/1')
-bulbq_parsed <- fromJSON(rawToChar(bulbq$content))
-```
-
-```{r}
-stat_names <- bulbq_parsed$stats$stat$name
-stat_vals <- bulbq_parsed$stats$base_stat
-
-```
-
-```{r}
-color_q <- GET('https://pokeapi.co/api/v2/pokemon-color/red')
-color_parsed <- fromJSON(rawToChar(color_q$content))
-```
-
-```{r}
-color_parsed$pokemon_species$name
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## Function: pokemon
@@ -155,7 +82,7 @@ pokemon <- function(pokemon, stats = TRUE){
 ```
 
 
-## Function: Pokemon_df
+## Function: pokemon_df
 
 ```{r}
 # Building a function for pokemon that allows you to pull a df
@@ -179,16 +106,16 @@ pokemon_df <- function(all = FALSE, last = NULL){
     last <- last_test$id
   }
   
-  # If all = TRUE, returning a df of all pokemon from Generation 1
+  # If all = TRUE, returning a df of all pokemon from Generation 1 + 2 (to 251)
   # NOTE: This is done to limit the burden on the APi
   if(all == TRUE){
-    last <- 151
+    last <- 251
   }
   
   # Establishing empty df to merge things to
   output_df <- rep("a",11)
-  #colnames(output_df) <- c("name","type_1","type_2","height","weight","hp","attack","defense","spec_attack","spec_defense","speed")
   
+  # Running for loop to populate df
   for(n in 1:last){
   
     # Getting API output
@@ -222,21 +149,189 @@ pokemon_df <- function(all = FALSE, last = NULL){
 
 ```{r}
 # Running pokemon_df on all to save for EDA
-all_pokemon <- pokemon_df(all = TRUE)
+# all_pokemon <- pokemon_df(all = TRUE)
 
 ```
 
 
+## Function: habitat
+
+```{r}
+habitat <- function(habitat){
+  ###
+  # Asks for habitat as an argument, returns a data frame of the pokemon who can
+  # be found in that habitat.
+  # 
+  # NOTE: Habitats are: cave, forest, grassland, mountain, rare, rough-terrain,
+  # sea, urban, and waters-edge.
+  ###
+  
+  # Establishing a habitat list for input checking
+  habitat_list <- c("cave", "forest", "grassland", "mountain", "rare", 
+                    "rough-terrain", "sea", "urban", "waters-edge")
+  
+  # Implementing a check and error message
+  if(!(habitat %in% habitat_list)){
+    stop("Please pick one of cave, forest, grassland, mountain, rare, 
+    rough-terrain, sea, urban, or waters-edge.")
+  }
+  
+  # Building output
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-habitat/',habitat,collapse =","))
+  
+  # Building output df and naming
+  output_df <- data.frame(output$pokemon_species$name)
+  colnames(output_df) <- c(habitat)
+  
+  # Returning results
+  return(output_df)
+}
+```
 
 
+## Function: color
+
+```{r}
+color <- function(color){
+  ###
+  # Asks for color as an argument, returns a data frame of all pokemon of that
+  # color.
+  #
+  # NOTE: Colors are - black, blue, brown, gray, green, pink, purple, red, white
+  # and yellow.
+  ###
+  
+  # Establishing a color list for input checking
+  color_list <- c("black","blue","brown","gray","grey","green","pink", 
+                  "purple","red","white","yellow")
+  
+  # Implementing a check and error message
+  if(!(color %in% color_list)){
+    stop("Please pick one of black, blue, brown, gray, green, pink, purple, red,
+    white, or yellow ")
+  }
+  
+  # Troubleshooting grey != gray
+  if(color == 'grey'){
+    color <- 'gray'
+  }
+  
+  # Building output
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-color/',color,collapse =","))
+  
+  # Establishing empty df
+  #output_df <- as.data.frame(output$)
+  
+  #for(i in 1:length(output$pokemon_species$name)){
+     #output_df <- as.data.frame(color, output$pokemon_species$name[i])
+  
+  output_df <- data.frame(output$pokemon_species$name)
+  colnames(output_df) <- c(color)
+  return(output_df)
+}
+```
 
 
+## Function: berry
+
+```{r}
+berry <- function(berry){
+  ###
+  # Asks for berry as an argument, returns growth_time, max_harvest, size,
+  # smoothness, soil_dryness, firmness, and flavor
+  #
+  # NOTE: The berries are: cheri, chesto, pecha, rawst, aspear, leppa, oran, 
+  # persim, lum, sitrus, figy, wiki, mago, aguav, iapapa, razz, bluk, nanab,
+  # wepear, pinap
+  ###
+  
+  # Building index df to convert user input into numeric 
+  index <- rep(1:20)
+  berry_list <- c("cheri", "chesto", "pecha", "rawst", "aspear", "leppa", "oran",
+                  "persim", "lum", "sitrus", "figy", "wiki", "mago", "aguav",
+                  "iapapa", "razz", "bluk", "nanab", "wepear", "pinap")
+  index_df <- data.frame(berry_list, index)
+  
+  # Switching berry user input to a number if necessary
+  if(is.numeric(berry) == FALSE){
+    berry <- which(index_df$berry_list == berry)
+  }
+  
+  # Building input
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/berry/',berry,collapse =","))
+  
+  output_row <- c(output$growth_time, output$max_harvest, output$size, 
+                  output$smoothness, output$soil_dryness, output$firmness$name,
+                  output$flavors$potency[1], output$flavors$potency[2],
+                  output$flavors$potency[3], output$flavors$potency[4],
+                  output$flavors$potency[5])
+  
+  output_names <- c("growth_time", "max_harvest", "size", "smoothness", 
+                    "soil_dryness", "firmness", "spicy","dry","sweet","bitter",
+                    "sour")
+  
+  output_df <- as.data.frame(output_row, output_names)
+  
+  colnames(output_df) <- output$name
+  
+  return(output_df)
+
+}
+```
 
 
+## Exploratory Data Analysis
+
+– You should pull data from at least two endpoints (possibly combining them into one)
+– You should create one new variable that is a function of the variables from a data set you use
+
+– You should create some contingency tables
+– You should create numerical summaries for some quantitative variables at each setting of some of your categorical variables
+– You should create at least five plots utilizing coloring, grouping, etc. All plots should have nice labels and titles.
+∗ You should have at least one bar plot, one histogram, one box plot, and one scatter plot
+
+```{r}
+# A one-way contigency table for primary type of Generation I and Generation II pokemon
+all_pokemon %>% group_by(type_1) %>% 
+  summarize(n())
+```
+```{r}
+# A table for secondary types of pokemon
+all_pokemon %>% group_by(type_2) %>% 
+  summarize(n())
+```
+
+```{r}
+types_table <- addmargins(table(all_pokemon$type_1, all_pokemon$type_2))
+types_table
+```
+
+```{r}
+# One way table of the frequency of pokemon's height
+table(as.numeric(all_pokemon$height))
+```
+
+```{r}
+#– You should create numerical summaries for some quantitative variables at each setting of some of your categorical variables
+#– You should create at least five plots utilizing coloring, grouping, etc. All plots should have nice labels and titles.
+#∗ You should have at least one bar plot, one histogram, one box plot, and one scatter plot
+```
+
+```{r}
+# Numerical summary for average weight of pokemon by type, creating a new variable for 'BMI"
+all_pokemon %>% group_by(type_1) %>% select(type_1, weight, height) %>% mutate(bmi = (as.numeric(weight)/as.numeric(height)^2)) %>%
+  summarise(AvgWeight = mean(as.numeric(weight)), SdWeight = sd(as.numeric(weight)), MedianWeight = median(as.numeric(weight)),AvgHeight = mean(as.numeric(height)), SdHeight = sd(as.numeric(height)), MedianHeight = median(as.numeric(height)), AvgBMI = mean(as.numeric(bmi)), SdBMI = sd(as.numeric(bmi)), MedianBMI = median(as.numeric(bmi)))
+```
 
 
+```{r}
+# Numerical summary for average weight of pokemon by type_1 and type_2
+all_pokemon %>% group_by(type_1) %>% 
+  summarise(AvgWeight = mean(as.numeric(weight)), AvgHeight = mean(as.numeric(weight)), AvgAttack = mean(as.numeric(attack)), AvgDefense = mean(as.numeric(defense)), AvgSpecAttack = mean(as.numeric(spec_attack)), AvgSpecDefense = mean(as.numeric(spec_defense)), AvgSpeed = mean(as.numeric(speed)))
+```
 
 
+## Conclusion
 
 
 
