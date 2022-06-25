@@ -235,7 +235,7 @@ color <- function(color){
 ## Function: berry
 
 ```{r}
-berry <- function(berry){
+berry <- function(all = NULL, berry = NULL){
   ###
   # Asks for berry as an argument, returns growth_time, max_harvest, size,
   # smoothness, soil_dryness, firmness, and flavor
@@ -257,26 +257,85 @@ berry <- function(berry){
     berry <- which(index_df$berry_list == berry)
   }
   
-  # Building input
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/berry/',berry,collapse =","))
+  # If user selects all berries
+  if(all == TRUE){
   
-  output_row <- c(output$growth_time, output$max_harvest, output$size, 
+    # Establishing empty df to merge things to
+    output_df <- rep("a",12)
+  
+    for(n in 1:20){
+      
+      # Getting API output
+      output <- fromJSON(paste0('https://pokeapi.co/api/v2/berry/',n,collapse =","))
+    
+      # Loading the data into a vector
+      output_row <- c(output$name, output$growth_time, output$max_harvest, output$size, 
                   output$smoothness, output$soil_dryness, output$firmness$name,
                   output$flavors$potency[1], output$flavors$potency[2],
                   output$flavors$potency[3], output$flavors$potency[4],
                   output$flavors$potency[5])
   
-  output_names <- c("growth_time", "max_harvest", "size", "smoothness", 
+      # Coercing into a data frame
+      output_frame <- as.data.frame(t(output_row))
+      colnames(output_frame) <- c("name", "growth_time", "max_harvest", "size", "smoothness", 
+                    "soil_dryness", "firmness", "spicy","dry","sweet","bitter",
+                    "sour")
+  
+      # Adding the stats to the output df
+      output_df <- rbind(output_df,output_frame)
+      
+    }
+    
+      # Fixing row names and removing extraneous 'starter' row
+      output_df <- output_df[-1,]
+      rownames(output_df) <- NULL
+      
+      # Fixing types of df
+      output_df <- transform(output_df, growth_time = as.numeric(growth_time),
+                             max_harvest = as.numeric(max_harvest), size = as.numeric(size),
+                             smoothness = as.numeric(smoothness), soil_dryness = as.numeric(soil_dryness),
+                             spicy = as.numeric(spicy), dry = as.numeric(dry),
+                             sweet = as.numeric(sweet), bitter = as.numeric(bitter),
+                             sour = as.numeric(sour))
+  
+      # Returning our desired data frame
+      return(output_df)
+  }
+  
+  # Building single output
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/berry/',berry,collapse =","))
+  
+  output_row <- c(output$name, output$growth_time, output$max_harvest, output$size, 
+                  output$smoothness, output$soil_dryness, output$firmness$name,
+                  output$flavors$potency[1], output$flavors$potency[2],
+                  output$flavors$potency[3], output$flavors$potency[4],
+                  output$flavors$potency[5])
+  
+  output_names <- c("name", "growth_time", "max_harvest", "size", "smoothness", 
                     "soil_dryness", "firmness", "spicy","dry","sweet","bitter",
                     "sour")
   
   output_df <- as.data.frame(output_row, output_names)
+  
+  # Fixing types of df
+  output_df <- transform(output_df, growth_time = as.numeric(growth_time),
+                 max_harvest = as.numeric(max_harvest), size = as.numeric(size),
+                 smoothness = as.numeric(smoothness), soil_dryness = as.numeric(soil_dryness),
+                 spicy = as.numeric(spicy), dry = as.numeric(dry),
+                 sweet = as.numeric(sweet), bitter = as.numeric(bitter), 
+                 sour = as.numeric(sour))
   
   colnames(output_df) <- output$name
   
   return(output_df)
 
 }
+```
+
+
+```{r}
+test <- berry(all = TRUE)
+test
 ```
 
 
@@ -328,6 +387,55 @@ all_pokemon %>% group_by(type_1) %>% select(type_1, weight, height) %>% mutate(b
 # Numerical summary for average weight of pokemon by type_1 and type_2
 all_pokemon %>% group_by(type_1) %>% 
   summarise(AvgWeight = mean(as.numeric(weight)), AvgHeight = mean(as.numeric(weight)), AvgAttack = mean(as.numeric(attack)), AvgDefense = mean(as.numeric(defense)), AvgSpecAttack = mean(as.numeric(spec_attack)), AvgSpecDefense = mean(as.numeric(spec_defense)), AvgSpeed = mean(as.numeric(speed)))
+```
+
+```{r}
+#– You should create at least five plots utilizing coloring, grouping, etc. All plots should have nice labels and titles.
+#∗ You should have at least one bar plot, one histogram, one box plot, and one scatter plot
+```
+
+Bar Plot
+
+```{r}
+type_bar <- ggplot(data = all_pokemon, aes( x = type_1))
+type_bar + geom_bar(aes(fill = type_2), position = "dodge") + xlab("1st Type") + ylab("Count") + labs(title = "Barplot of a Pokemon's Primary Type by Secondary Type") +
+  scale_fill_discrete(name = "2nd Type") + theme(axis.text.x = element_text(angle = 45))
+```
+
+
+Histogram
+
+```{r}
+type_hist <- ggplot(data = all_pokemon, aes(x = as.numeric(weight)))
+type_hist + geom_histogram(fill = "red") + labs(title = "Histogram of Pokemon Weight\n(Pokemon no.1-251)") +
+  xlab("Weight") + ylab("Count")
+```
+
+
+Box Plot
+
+```{r}
+# Creating plotting item and generating BMI
+bmi_df <- all_pokemon %>% select(name, type_1, weight, height) %>% mutate(bmi = (as.numeric(weight)/as.numeric(height)^2)) %>% mutate(gen = NA)
+
+# Establishing gen values
+bmi_df$gen[1:151] <- "1"
+bmi_df$gen[152:251] <- "2"
+
+bmi_box <- ggplot(bmi_df, aes(x = gen, y = bmi))
+bmi_box + geom_boxplot() + geom_jitter(aes(color = type_1), width = 0.3) + 
+  labs(title = "Boxplot of Pokemon BMI by Generation\n(Gen. 1 and 2)", x = "Generation", y = "BMI", color = "Primary Type")
+
+
+```
+
+
+Scatter Plot
+
+```{r}
+pokemon_scatter <- ggplot(all_pokemon, aes(x = as.numeric(weight), y = as.numeric(height)))
+pokemon_scatter + geom_point(aes(color = type_1)) + geom_smooth(method = lm) +
+  labs(title = "Association between Weight and Height of Pokemon By Type\n(Gen. 1 and 2)", x = 'Weight', y = 'Height', color = 'Primary Type')
 ```
 
 
