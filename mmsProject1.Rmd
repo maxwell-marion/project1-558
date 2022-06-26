@@ -517,9 +517,9 @@ Similarly, a histogram confirms that the case with weight is very similar.
 
 ```{r}
 type_hist <- ggplot(data = all_pokemon, aes(x = weight))
-type_hist + geom_histogram(fill = "red", bins = 100) 
-+ labs(title = "Histogram of Pokemon Weight\n(Pokemon no.1-251)") +
-  xlab("Weight") + ylab("Count")
+type_hist + geom_histogram(fill = "red", bins = 100) + 
+  labs(title = "Histogram of Pokemon Weight\n(Pokemon no.1-251)") + xlab("Weight") + 
+  ylab("Count")
 ```
 
 But what about how these two variables relate?

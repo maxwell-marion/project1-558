@@ -1,5 +1,6 @@
-# Using the PokeAPI: Examining and creating functions for the pokemon, habitat, color, egg-group, and berry endpoints
-
+Using the PokeAPI: Examining and creating functions for the pokemon,
+habitat, color, egg-group, and berry endpoints
+================
 Maxwell Marion-Spencer
 2022-06-26
 
@@ -63,25 +64,39 @@ pokemon <- function(pokemon, stats = TRUE){
   
   # Accounting for the user entering a number rather than a specific Pokémon
   if(is.numeric(pokemon) == TRUE){
-    last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',last,collapse =","))
+    last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',last,
+                                 collapse =","))
     pokemon <- last_test$name
   }
   
   # Getting API output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',pokemon,collapse =","))
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',pokemon,
+                            collapse =","))
   
   # Output if user DOES want to see the battle stat attributes of the pokemon
   if(stats == TRUE){
     
   # Loading the data into a vector
-  output_row <- c(pokemon,  output$types$type$name[1], output$types$type$name[2],output$height,output$weight,      output$stats$base_stat[1],output$stats$base_stat[2],output$stats$base_stat[3],output$stats$base_stat[4],output$stats$base_stat[5],output$stats$base_stat[6])
+  output_row <- c(pokemon,  output$types$type$name[1], output$types$type$name[2],
+                  output$height,output$weight,output$stats$base_stat[1],
+                  output$stats$base_stat[2],output$stats$base_stat[3],
+                  output$stats$base_stat[4],output$stats$base_stat[5],
+                  output$stats$base_stat[6])
   
   # Coercing into a data frame
   output_frame <- as.data.frame(t(output_row))
-  colnames(output_frame) <- c("name","type_1","type_2","height","weight","hp","attack","defense","spec_attack","spec_defense","speed")
+  colnames(output_frame) <- c("name","type_1","type_2","height","weight","hp",
+                              "attack","defense","spec_attack","spec_defense",
+                              "speed")
   
   # Making the numeric variables properly numeric
-  output_frame <- transform(output_frame, height = as.numeric(height),weight = as.numeric(weight),hp = as.numeric(hp), attack = as.numeric(attack), defense = as.numeric(defense), spec_attack = as.numeric(spec_attack),spec_defense = as.numeric(spec_defense), speed = as.numeric(speed))
+  output_frame <- transform(output_frame, height = as.numeric(height),
+                            weight = as.numeric(weight),hp = as.numeric(hp),
+                            attack = as.numeric(attack), 
+                            defense = as.numeric(defense), 
+                            spec_attack = as.numeric(spec_attack),
+                            spec_defense = as.numeric(spec_defense), 
+                            speed = as.numeric(speed))
   
   # Returning a nice data frame
   return(output_frame)
@@ -91,14 +106,16 @@ pokemon <- function(pokemon, stats = TRUE){
   if(stats == FALSE){
     
   # Loading the data into a vector
-  output_row <- c(pokemon, output$types$type$name[1], output$types$type$name[2], output$height, output$weight)
+  output_row <- c(pokemon, output$types$type$name[1], output$types$type$name[2],
+                  output$height, output$weight)
   
   # Coercing into a data frame
   output_frame <- as.data.frame(t(output_row))
   colnames(output_frame) <- c("name","type_1","type_2","height","weight")
   
   # Making the numeric variables properly numeric
-  output_frame <- transform(output_frame, height = as.numeric(height), weight = as.numeric(weight))
+  output_frame <- transform(output_frame, height = as.numeric(height), 
+                            weight = as.numeric(weight))
   
   # Returning a nice data frame
   return(output_frame)
@@ -139,7 +156,8 @@ pokemon_df <- function(all = FALSE, last = NULL){
   
   # Accounting for the user entering a number rather than a specific Pokémon
   if(is.numeric(last) == TRUE){
-     last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',last,collapse =","))
+     last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',
+                                  last,collapse =","))
      last <- last_test$name
   }
   
@@ -156,14 +174,22 @@ pokemon_df <- function(all = FALSE, last = NULL){
   for(n in 1:last){
   
     # Getting API output
-    output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',n,collapse =","))
+    output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',n,
+                              collapse =","))
     
     # Loading the data into a vector
-    output_row <- c(output$name,  output$types$type$name[1], output$types$type$name[2],output$height,output$weight,         output$stats$base_stat[1],output$stats$base_stat[2],output$stats$base_stat[3],output$stats$base_stat[4],output$stats$base_stat[5],output$stats$base_stat[6])
+    output_row <- c(output$name,  output$types$type$name[1], 
+                    output$types$type$name[2],output$height,
+                    output$weight,output$stats$base_stat[1],
+                    output$stats$base_stat[2],output$stats$base_stat[3],
+                    output$stats$base_stat[4],output$stats$base_stat[5],
+                    output$stats$base_stat[6])
   
     # Coercing into a data frame
     output_frame <- as.data.frame(t(output_row))
-    colnames(output_frame) <- c("name","type_1","type_2","height","weight","hp","attack","defense","spec_attack","spec_defense","speed")
+    colnames(output_frame) <- c("name","type_1","type_2","height","weight",
+                                "hp","attack","defense","spec_attack",
+                                "spec_defense","speed")
   
   # Adding the stats to the output df
   output_df <- rbind(output_df,output_frame)
@@ -222,7 +248,8 @@ habitat <- function(habitat){
   }
   
   # Building output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-habitat/',habitat,collapse =","))
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-habitat/',
+                            habitat,collapse =","))
   
   # Building output df and naming
   output_df <- data.frame(output$pokemon_species$name)
@@ -272,7 +299,8 @@ color <- function(color){
   }
   
   # Building output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-color/',color,collapse =","))
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-color/',
+                            color,collapse =","))
   
   output_df <- data.frame(output$pokemon_species$name)
   colnames(output_df) <- c(color)
@@ -315,7 +343,8 @@ egg_group <- function(group){
   }
   
   # Building output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/egg-group/',group,collapse =","))
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/egg-group/',
+                            group,collapse =","))
   
   # Correcting output
   output_df <- data.frame(output$pokemon_species$name)
@@ -374,17 +403,18 @@ berry <- function(all = NULL, berry = NULL){
       output <- fromJSON(paste0('https://pokeapi.co/api/v2/berry/',n,collapse =","))
     
       # Loading the data into a vector
-      output_row <- c(output$name, output$growth_time, output$max_harvest, output$size, 
-                  output$smoothness, output$soil_dryness, output$firmness$name,
-                  output$flavors$potency[1], output$flavors$potency[2],
-                  output$flavors$potency[3], output$flavors$potency[4],
-                  output$flavors$potency[5])
+      output_row <- c(output$name, output$growth_time, output$max_harvest, 
+                      output$size,output$smoothness, output$soil_dryness, 
+                      output$firmness$name,output$flavors$potency[1], 
+                      output$flavors$potency[2],output$flavors$potency[3],
+                      output$flavors$potency[4],output$flavors$potency[5])
   
       # Coercing into a data frame
       output_frame <- as.data.frame(t(output_row))
-      colnames(output_frame) <- c("name", "growth_time", "max_harvest", "size", "smoothness", 
-                    "soil_dryness", "firmness", "spicy","dry","sweet","bitter",
-                    "sour")
+      colnames(output_frame) <- c("name", "growth_time", "max_harvest",
+                                  "size", "smoothness","soil_dryness", 
+                                  "firmness", "spicy","dry","sweet","bitter",
+                                  "sour")
   
       # Adding the stats to the output df
       output_df <- rbind(output_df,output_frame)
@@ -398,15 +428,19 @@ berry <- function(all = NULL, berry = NULL){
       
       # Fixing types of df
       output_df <- transform(output_df, growth_time = as.numeric(growth_time),
-                             max_harvest = as.numeric(max_harvest), size = as.numeric(size),
-                             smoothness = as.numeric(smoothness), soil_dryness = as.numeric(soil_dryness),
+                             max_harvest = as.numeric(max_harvest), 
+                             size = as.numeric(size),
+                             smoothness = as.numeric(smoothness),
+                             soil_dryness = as.numeric(soil_dryness),
                              spicy = as.numeric(spicy), dry = as.numeric(dry),
-                             sweet = as.numeric(sweet), bitter = as.numeric(bitter),
+                             sweet = as.numeric(sweet), 
+                             bitter = as.numeric(bitter),
                              sour = as.numeric(sour))
   
       # Setting firmness as a factor
       output_df$firmness <- as.factor(output_df$firmness)
-      levels(output_df$firmness) <- c('very-soft','soft','hard','very-hard','super-hard')
+      levels(output_df$firmness) <- c('very-soft','soft',
+                                      'hard','very-hard','super-hard')
       
       
       # Returning our desired data frame
@@ -414,13 +448,14 @@ berry <- function(all = NULL, berry = NULL){
   }
   
   # Building single output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/berry/',berry,collapse =","))
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/berry/',berry,
+                            collapse =","))
   
-  output_row <- c(output$name, output$growth_time, output$max_harvest, output$size, 
-                  output$smoothness, output$soil_dryness, output$firmness$name,
-                  output$flavors$potency[1], output$flavors$potency[2],
-                  output$flavors$potency[3], output$flavors$potency[4],
-                  output$flavors$potency[5])
+  output_row <- c(output$name, output$growth_time, output$max_harvest, 
+                  output$size, output$smoothness, output$soil_dryness,
+                  output$firmness$name, output$flavors$potency[1], 
+                  output$flavors$potency[2],output$flavors$potency[3], 
+                  output$flavors$potency[4],output$flavors$potency[5])
   
   output_names <- c("name", "growth_time", "max_harvest", "size", "smoothness", 
                     "soil_dryness", "firmness", "spicy","dry","sweet","bitter",
@@ -431,14 +466,16 @@ berry <- function(all = NULL, berry = NULL){
   # Fixing types of df
   output_df <- transform(output_df, growth_time = as.numeric(growth_time),
                  max_harvest = as.numeric(max_harvest), size = as.numeric(size),
-                 smoothness = as.numeric(smoothness), soil_dryness = as.numeric(soil_dryness),
+                 smoothness = as.numeric(smoothness), 
+                 soil_dryness = as.numeric(soil_dryness),
                  spicy = as.numeric(spicy), dry = as.numeric(dry),
                  sweet = as.numeric(sweet), bitter = as.numeric(bitter), 
                  sour = as.numeric(sour))
   
   # Setting firmness as a factor
   output_df$firmness <- as.factor(output_df$firmness)
-  levels(output_df$firmness) <- c('very-soft','soft','hard','very-hard','super-hard')
+  levels(output_df$firmness) <- c('very-soft','soft','hard','very-hard',
+                                  'super-hard')
   
   colnames(output_df) <- output$name
   
@@ -540,55 +577,38 @@ types_table
 ```
 
     ##           
-    ##            dark dragon electric fairy fighting fire flying grass ground ice poison psychic rock steel water
-    ##   bug         0      0        0     0        1    0      5     2      0   0      7       0    1     2     0
-    ##   dark        0      0        0     0        0    2      1     0      0   1      0       0    0     0     0
-    ##   dragon      0      0        0     0        0    0      1     0      0   0      0       0    0     0     0
-    ##   electric    0      0        0     0        0    0      1     0      0   0      0       0    0     2     0
-    ##   fairy       0      0        0     0        0    0      1     0      0   0      0       0    0     0     0
-    ##   fighting    0      0        0     0        0    0      0     0      0   0      0       0    0     0     0
-    ##   fire        0      0        0     0        0    0      3     0      0   0      0       0    1     0     0
-    ##   ghost       0      0        0     0        0    0      0     0      0   0      3       0    0     0     0
-    ##   grass       0      0        0     0        0    0      3     0      0   0      9       2    0     0     0
-    ##   ground      0      0        0     0        0    0      1     0      0   0      0       0    2     0     0
-    ##   ice         0      0        0     0        0    0      2     0      2   0      0       2    0     0     0
-    ##   normal      0      0        0     3        0    0     10     0      0   0      0       1    0     0     0
-    ##   poison      0      0        0     0        0    0      3     0      2   0      0       0    0     0     0
-    ##   psychic     0      0        0     1        0    0      3     1      0   0      0       0    0     0     0
-    ##   rock        1      0        0     0        0    0      1     0      6   0      0       0    0     0     4
-    ##   steel       0      0        0     0        0    0      1     0      1   0      0       0    0     0     0
-    ##   water       0      1        2     2        1    0      2     0      2   3      3       4    1     0     0
-    ##   Sum         1      1        2     6        2    2     38     3     13   4     22       9    5     4     4
-    ##           
-    ##            Sum
-    ##   bug       18
-    ##   dark       4
-    ##   dragon     1
-    ##   electric   3
-    ##   fairy      1
-    ##   fighting   0
-    ##   fire       4
-    ##   ghost      3
-    ##   grass     14
-    ##   ground     3
-    ##   ice        6
-    ##   normal    14
-    ##   poison     5
-    ##   psychic    5
-    ##   rock      12
-    ##   steel      2
-    ##   water     21
-    ##   Sum      116
+    ##            dark dragon electric fairy fighting fire flying grass ground ice poison psychic rock steel water Sum
+    ##   bug         0      0        0     0        1    0      5     2      0   0      7       0    1     2     0  18
+    ##   dark        0      0        0     0        0    2      1     0      0   1      0       0    0     0     0   4
+    ##   dragon      0      0        0     0        0    0      1     0      0   0      0       0    0     0     0   1
+    ##   electric    0      0        0     0        0    0      1     0      0   0      0       0    0     2     0   3
+    ##   fairy       0      0        0     0        0    0      1     0      0   0      0       0    0     0     0   1
+    ##   fighting    0      0        0     0        0    0      0     0      0   0      0       0    0     0     0   0
+    ##   fire        0      0        0     0        0    0      3     0      0   0      0       0    1     0     0   4
+    ##   ghost       0      0        0     0        0    0      0     0      0   0      3       0    0     0     0   3
+    ##   grass       0      0        0     0        0    0      3     0      0   0      9       2    0     0     0  14
+    ##   ground      0      0        0     0        0    0      1     0      0   0      0       0    2     0     0   3
+    ##   ice         0      0        0     0        0    0      2     0      2   0      0       2    0     0     0   6
+    ##   normal      0      0        0     3        0    0     10     0      0   0      0       1    0     0     0  14
+    ##   poison      0      0        0     0        0    0      3     0      2   0      0       0    0     0     0   5
+    ##   psychic     0      0        0     1        0    0      3     1      0   0      0       0    0     0     0   5
+    ##   rock        1      0        0     0        0    0      1     0      6   0      0       0    0     0     4  12
+    ##   steel       0      0        0     0        0    0      1     0      1   0      0       0    0     0     0   2
+    ##   water       0      1        2     2        1    0      2     0      2   3      3       4    1     0     0  21
+    ##   Sum         1      1        2     6        2    2     38     3     13   4     22       9    5     4     4 116
 
 Let’s examine this information in graph form.
 
 ``` r
 type_bar <- ggplot(data = all_pokemon, aes( x = type_1))
-type_bar + geom_bar(aes(fill = type_2), position = "dodge") + xlab("1st Type") + ylab("Count") + labs(title = "Barplot of a Pokemon's Primary Type by Secondary Type") +
-  scale_fill_discrete(name = "2nd Type") + theme(axis.text.x = element_text(angle = 45))
+type_bar + geom_bar(aes(fill = type_2), position = "dodge") + 
+  xlab("1st Type") + ylab("Count") + 
+  labs(title = "Barplot of a Pokemon's Primary Type by Secondary Type") +
+  scale_fill_discrete(name = "2nd Type") + theme(axis.text.x = 
+                                                   element_text(angle = 45))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 From this bar plot we can see that Fighting type Pokémon have no
 individuals with secondary types, while Water, Rock, and Bug types are
@@ -617,11 +637,12 @@ similar.
 
 ``` r
 type_hist <- ggplot(data = all_pokemon, aes(x = weight))
-type_hist + geom_histogram(fill = "red", bins = 100) + labs(title = "Histogram of Pokemon Weight\n(Pokemon no.1-251)") +
-  xlab("Weight") + ylab("Count")
+type_hist + geom_histogram(fill = "red", bins = 100) + 
+  labs(title = "Histogram of Pokemon Weight\n(Pokemon no.1-251)") + xlab("Weight") + 
+  ylab("Count")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 But what about how these two variables relate?
 
@@ -635,7 +656,7 @@ pokemon_scatter + geom_point(aes(color = type_1)) + geom_smooth(method = lm) +
 
     ## `geom_smooth()` using formula 'y ~ x'
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 We can see that up until about the 2000 mark for Weight, the correlation
 is very linear! After that, those pesky Rock and Steel type pokemon seem
@@ -716,7 +737,7 @@ bmi_box + geom_boxplot() + geom_jitter(aes(color = type_1), width = 0.3) +
        x = "Generation", y = "BMI", color = "Primary Type")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 Our box plot shows that the BMI’s for Generation 1 and Generation 2 seem
 to be similarly distributed. We can also see that a good number of our
@@ -788,7 +809,7 @@ berry_hist + geom_histogram(fill = "purple", stat = "count") + labs(title = "Fir
 
     ## Warning: Ignoring unknown parameters: binwidth, bins, pad
 
-![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 Of the five firmness levels, hard is the most common with six berries
 falling into that category, while super-hard is by far the least common
@@ -800,12 +821,13 @@ and the size that it grows to, let’s find out with a scatter plot.
 ``` r
 berry_scatter <- ggplot(all_berry, aes(x = size, y = growth_time))
 berry_scatter + geom_point(aes(color = firmness)) + geom_smooth(method = lm) +
-  labs(title = "Association Between Size and Growth Time of Berries", x = 'Size', y = 'Growth Time', color = 'Firmness')
+  labs(title = "Association Between Size and Growth Time of Berries", 
+       x = 'Size', y = 'Growth Time', color = 'Firmness')
 ```
 
     ## `geom_smooth()` using formula 'y ~ x'
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 ``` r
 levels(all_berry$firmness)
