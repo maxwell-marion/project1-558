@@ -1,6 +1,5 @@
-Using the PokeAPI: Examining and creating functions for the pokemon,
-habitat, color, egg-group, and berry endpoints
-================
+# Using the PokeAPI: Examining and creating functions for the pokemon, habitat, color, egg-group, and berry endpoints
+
 Maxwell Marion-Spencer
 2022-06-26
 
