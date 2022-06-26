@@ -569,7 +569,7 @@ type_bar + geom_bar(aes(fill = type_2), position = "dodge") + xlab("1st Type") +
   scale_fill_discrete(name = "2nd Type") + theme(axis.text.x = element_text(angle = 45))
 ```
 
-![](C:/Users/mxmx/Documents/repos/project1-558/project1-558/README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 From this bar plot we can see that Fighting type Pokémon have no
 individuals with secondary types, while Water, Rock, and Bug types are
@@ -602,7 +602,7 @@ type_hist + geom_histogram(fill = "red", bins = 100) + labs(title = "Histogram o
   xlab("Weight") + ylab("Count")
 ```
 
-![](C:/Users/mxmx/Documents/repos/project1-558/project1-558/README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 But what about how these two variables relate?
 
@@ -616,7 +616,7 @@ pokemon_scatter + geom_point(aes(color = type_1)) + geom_smooth(method = lm) +
 
     ## `geom_smooth()` using formula 'y ~ x'
 
-![](C:/Users/mxmx/Documents/repos/project1-558/project1-558/README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 We can see that up until about the 2000 mark for Weight, the correlation
 is very linear! After that, those pesky Rock and Steel type pokemon seem
@@ -697,7 +697,7 @@ bmi_box + geom_boxplot() + geom_jitter(aes(color = type_1), width = 0.3) +
        x = "Generation", y = "BMI", color = "Primary Type")
 ```
 
-![](C:/Users/mxmx/Documents/repos/project1-558/project1-558/README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 Our box plot shows that the BMI’s for Generation 1 and Generation 2 seem
 to be similarly distributed. We can also see that a good number of our
@@ -769,7 +769,7 @@ berry_hist + geom_histogram(fill = "purple", stat = "count") + labs(title = "Fir
 
     ## Warning: Ignoring unknown parameters: binwidth, bins, pad
 
-![](C:/Users/mxmx/Documents/repos/project1-558/project1-558/README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 Of the five firmness levels, hard is the most common with six berries
 falling into that category, while super-hard is by far the least common
@@ -786,7 +786,7 @@ berry_scatter + geom_point(aes(color = firmness)) + geom_smooth(method = lm) +
 
     ## `geom_smooth()` using formula 'y ~ x'
 
-![](C:/Users/mxmx/Documents/repos/project1-558/project1-558/README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 levels(all_berry$firmness)
