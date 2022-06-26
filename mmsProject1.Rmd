@@ -460,6 +460,7 @@ type_bar <- ggplot(data = all_pokemon, aes( x = type_1))
 type_bar + geom_bar(aes(fill = type_2), position = "dodge") + xlab("1st Type") + ylab("Count") + labs(title = "Barplot of a Pokemon's Primary Type by Secondary Type") +
   scale_fill_discrete(name = "2nd Type") + theme(axis.text.x = element_text(angle = 45))
 ```
+
 From this bar plot we can see that Fighting type Pokémon have no individuals with secondary types, while Water, Rock, and Bug types are fairly diverse. We are also able to see that what we learned before - that the majority of Pokémon have no secondary type seems to bear out quiet clearly, with the highest bars in many cases representing the 'NA' secondary type. 
 
 
