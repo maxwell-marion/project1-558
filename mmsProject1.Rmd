@@ -1,14 +1,16 @@
 ---
-title: "Using the PokeAPI"
+title: "Using the PokeAPI: Examining and creating functions for the pokemon, habitat, color, egg-group, and berry endpoints"
 author: "Maxwell Marion-Spencer"
 date: '2022-06-26'
-output: html_document:
-  toc: true
+output: 
+  github_document:
+    toc: true
+    toc_depth: 2
 ---
 
 # Requirements
 
-List of requirements:
+List of required packages:
 
 - `tidyverse`
 - `httr`
@@ -21,15 +23,19 @@ library(httr)
 ```
 
 
-This vignette will highlight some of the many features of the [PokeAPI](https://pokeapi.co/), while also providing a few funtions that may be useful for pulling and analysing data. 
+This vignette will highlight some of the many features of the [PokeAPI](https://pokeapi.co/), while also providing a few functions that may be useful for pulling and analyzing data from this API. 
 
-
+Additionally, I will examine some of the trends and relationships across Pokémon from the first two generations, as well as taking a look at the numerous berries that can be found in the game. 
 
 
 # Functions
 
-## Function: pokemon
+PokeAPI is a RESTful API that covers "everything from Pokémon to Berry Flavors." Fittingly, our functions will begin with the `pokemon` endpoint, and conclude with the `berry` endpoint. 
 
+
+## `pokemon`
+
+The `pokemon` function allows you to bring in information about a particular Pokémon by using the `pokemon` endpoint. The user has the option to specify whether or not they would also like to receive the Pokémon's statistics, which characterize how effective a Pokémon is in battle. This `stats` option is included by default. When this option is not specified only the height, weight, and type(s) are included. 
 
 ```{r}
 # Building 'Pokemon' Query function
@@ -40,8 +46,16 @@ pokemon <- function(pokemon, stats = TRUE){
   #  special attack, special defense, speed)
   ###
   
-  # Fixing case
-  pokemon <- tolower(pokemon)
+  # Fixing case, if last is entered as a specific pokemon
+  if(is.character(pokemon == TRUE)){
+     pokemon <- tolower(pokemon)
+  }
+  
+  # Accounting for the user entering a number rather than a specific Pokémon
+  if(is.numeric(pokemon) == TRUE){
+    last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',last,collapse =","))
+    pokemon <- last_test$name
+  }
   
   # Getting API output
   output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',pokemon,collapse =","))
@@ -83,7 +97,13 @@ pokemon <- function(pokemon, stats = TRUE){
 ```
 
 
-## Function: pokemon_df
+## `pokemon_df`
+
+Progressing logically, the `pokemon_df` function also uses the `pokemon` endpoint and allows you to procure a data frame containing either all of the pokemon (using the `all = TRUE` option) or simply a list from Pokémon #1, to the desired last Pokémon to be included. 
+
+(e.g): If you wanted to pull in from Bulbasaur (#1) to Charizard (#6), you would use: pokemon_df(last = "Charizard") or pokemon_df(last = 6)
+
+The user also has the option of returning a data frame with information from all Pokémon (up to #251, or Gen 2) by utilizing the `all = TRUE` argument. If desired, you could adjust the function to make the search unlimited (to Pokémon #1126) but this would take quite some time!
 
 ```{r}
 # Building a function for pokemon that allows you to pull a df
@@ -101,10 +121,10 @@ pokemon_df <- function(all = FALSE, last = NULL){
     last <- tolower(last)
   }
   
-  # Accounting for the user entering a specifc pokemon rather than a numeric id
-  if(is.numeric(last) == FALSE){
-    last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',last,collapse =","))
-    last <- last_test$id
+  # Accounting for the user entering a number rather than a specific Pokémon
+  if(is.numeric(last) == TRUE){
+     last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',last,collapse =","))
+     last <- last_test$name
   }
   
   # If all = TRUE, returning a df of all pokemon from Generation 1 + 2 (to 251)
@@ -154,13 +174,11 @@ pokemon_df <- function(all = FALSE, last = NULL){
 ```
 
 
-```{r}
-#Running pokemon_df on all to save for EDA
-all_pokemon <- pokemon_df(all = TRUE)
-```
+## `habitat`
 
+The `habitat` function makes use of the `pokemon-habitat` endpoint of the PokeAPI, and pulls in a list of Pokémon that occupy the specified habitat. This function also checks the user's input against a list of acceptable habitats, and returns an message if the habitat the user has specified is not appropriate for querying the API, along with a list of appropriate habitats. 
 
-## Function: habitat
+(e.g): `habitat("cave") returns a data frame of cave: zubat, diglett, (...), registeel.
 
 ```{r}
 habitat <- function(habitat){
@@ -195,7 +213,11 @@ habitat <- function(habitat){
 ```
 
 
-## Function: color
+## `color`
+
+Similarly, the `color` function returns a data frame of all Pokémon that match the user-specified color. This function also checks the user's input against a list of acceptable colors, and returns an message if the color the user has specified is not appropriate for querying the API, along with a list of appropriate colors. One small quality of life addition is if the user enters the color 'grey' it is adjusted to 'gray.' 
+
+(e.g): color('yellow') returns a data frame of yellow: sandshrew, meowth, (...), cofagrigus. 
 
 ```{r}
 color <- function(color){
@@ -225,12 +247,6 @@ color <- function(color){
   # Building output
   output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-color/',color,collapse =","))
   
-  # Establishing empty df
-  #output_df <- as.data.frame(output$)
-  
-  #for(i in 1:length(output$pokemon_species$name)){
-     #output_df <- as.data.frame(color, output$pokemon_species$name[i])
-  
   output_df <- data.frame(output$pokemon_species$name)
   colnames(output_df) <- c(color)
   return(output_df)
@@ -238,7 +254,56 @@ color <- function(color){
 ```
 
 
-## Function: berry
+## `egg_group`
+
+The `egg_group` function returns a data frame of all Pokémon that fall under a user-specified egg group. This function also checks the user's input against a list of acceptable groups, and returns an message if the group the user has specified is not appropriate for querying the API, along with a list of appropriate groups.
+
+
+(e.g): egg_group('dragon') returns a data frame of dragon: charmander,charmeleon, (...), dragapult. 
+
+```{r}
+egg_group <- function(group){
+  ###
+  # Asks for egg group as an argument and returns all pokemon from that egg 
+  # group
+  #
+  # NOTE: The egg groups are: monster, water1, bug, flying, ground, fairy, plant,
+  #       humanshape, water3, mineral, indeterminate, water2, ditto, dragon, 
+  #       and no-eggs
+  ###
+  
+  # Establishing a group list for input checking
+  egg_list <- c("monster", "water1", "bug", "flying", "ground", "fairy", "plant",
+        "humanshape", "water3", "mineral", "indeterminate", "water2", "ditto",
+        "dragon", "no-eggs")
+  
+  # Implementing a check and error message
+  if(!(group %in% egg_list)){
+    stop("Please pick one of: monster, water1, bug, flying, ground, fairy, plant,
+         humanshape, water3, mineral, indeterminate, water2, ditto, dragon, 
+         or no-eggs")
+  }
+  
+  # Building output
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/egg-group/',group,collapse =","))
+  
+  # Correcting output
+  output_df <- data.frame(output$pokemon_species$name)
+  colnames(output_df) <- c(output$name)
+  
+  # Returning output_df
+  return(output_df)
+  
+}
+```
+
+
+## `berry`
+
+Our final function `berry` allows users to specify either a particular berry (with the argument `berry = `) that they wish to learn about, or a data frame of all berries and their information (with the argument `all = `) by utilizing the `berry` endpoint. The output is then adjusted to properly reflect the type of variables, including adjusting `firmness` to be a factor with multiple levels. 
+
+Like with the previous functions, a user's input is checked against a list of berries that are appropriate options.
+
 
 ```{r}
 berry <- function(all = NULL, berry = NULL){
@@ -349,82 +414,88 @@ berry <- function(all = NULL, berry = NULL){
 ```
 
 
-## Function: egg_group
+# Exploratory Data Analysis
 
-```{r}
-egg_group <- function(group){
-  ###
-  # Asks for egg group as an argument and returns all pokemon from that egg 
-  # group
-  #
-  # NOTE: The egg groups are: monster, water1, bug, flying, ground, fairy, plant,
-  #       humanshape, water3, mineral, indeterminate, water2, ditto, dragon, 
-  #       and no-eggs
-  ###
-  
-  # Establishing a group list for input checking
-  egg_list <- c("monster", "water1", "bug", "flying", "ground", "fairy", "plant",
-        "humanshape", "water3", "mineral", "indeterminate", "water2", "ditto",
-        "dragon", "no-eggs")
-  
-  # Implementing a check and error message
-  if(!(group %in% egg_list)){
-    stop("Please pick one of: monster, water1, bug, flying, ground, fairy, plant,
-         humanshape, water3, mineral, indeterminate, water2, ditto, dragon, 
-         or no-eggs")
-  }
-  
-  # Building output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/egg-group/',group,collapse =","))
-  
-  # Correcting output
-  output_df <- data.frame(output$pokemon_species$name)
-  colnames(output_df) <- c(output$name)
-  
-  # Returning output_df
-  return(output_df)
-  
-}
+## Pokémon Analysis
+
+Where should would we start with our exploration of data from the PokeApi? with Pokémon of course!
+
+To begin, we can bring in all 251 Pokémon from the first and second generation of Pokémon, using: `pokemon_df(all = TRUE)`
+
+```{r, message = FALSE, warning = FALSE}
+all_pokemon <- pokemon_df(all = TRUE)
 ```
 
-
-```{r}
-# Creating all berry df for EDA
-all_berry <- berry(all = TRUE)
-#all_berry
-```
-
-
-## Exploratory Data Analysis
-
-– You should pull data from at least two endpoints (possibly combining them into one)
-– You should create one new variable that is a function of the variables from a data set you use
-
-– You should create some contingency tables
-– You should create numerical summaries for some quantitative variables at each setting of some of your categorical variables
-– You should create at least five plots utilizing coloring, grouping, etc. All plots should have nice labels and titles.
-∗ You should have at least one bar plot, one histogram, one box plot, and one scatter plot
+Let's examine the rough distribution of primary types across these Pokémon.
 
 ```{r}
 # A one-way contigency table for primary type of Generation I and Generation II pokemon
 all_pokemon %>% group_by(type_1) %>% 
   summarize(n())
 ```
+
+We can see that Water and Normal type Pokémon seem to be well represented, at 46 and 37 respectively. On the other side of things, there are only 2 pokemon whose primary type is Steel, and 3 who are primarily Dragon type. 
+
+Continuing on, we can create a table of secondary types.
+
 ```{r}
 # A table for secondary types of pokemon
 all_pokemon %>% group_by(type_2) %>% 
   summarize(n())
 ```
 
+From this table we are able to see that by far the largest category of secondary type is None! Flying, Poison, and Ground are the standsouts otherwise (38,22,13), with every other type being relatively negligibly represented.
+
+Creating a two-way table of primary vs. secondary types, we can represent this information another way, and we are able to see that a total of 116 pokemon have secondary types, while 135 (a majority) have no secondary type. 
+
 ```{r}
 types_table <- addmargins(table(all_pokemon$type_1, all_pokemon$type_2))
 types_table
 ```
 
+Let's examine this information in graph form. 
+
+```{r}
+type_bar <- ggplot(data = all_pokemon, aes( x = type_1))
+type_bar + geom_bar(aes(fill = type_2), position = "dodge") + xlab("1st Type") + ylab("Count") + labs(title = "Barplot of a Pokemon's Primary Type by Secondary Type") +
+  scale_fill_discrete(name = "2nd Type") + theme(axis.text.x = element_text(angle = 45))
+```
+From this bar plot we can see that Fighting type Pokémon have no individuals with secondary types, while Water, Rock, and Bug types are fairly diverse. We are also able to see that what we learned before - that the majority of Pokémon have no secondary type seems to bear out quiet clearly, with the highest bars in many cases representing the 'NA' secondary type. 
+
+
+
+If we are curious about other physical characteristics of Pokémon, we can take a look at weight, or height - like in the table below:
+
 ```{r}
 # One way table of the frequency of pokemon's height
-table(as.numeric(all_pokemon$height))
+table(all_pokemon$height)
 ```
+
+This table shows us that the heights of Pokémon appear to be strongly skewed right, with quite a long tail.
+
+Similarly, a histogram confirms that the case with weight is very similar. 
+
+```{r}
+type_hist <- ggplot(data = all_pokemon, aes(x = weight))
+type_hist + geom_histogram(fill = "red", bins = 100) + labs(title = "Histogram of Pokemon Weight\n(Pokemon no.1-251)") +
+  xlab("Weight") + ylab("Count")
+```
+
+But what about how these two variables relate?
+
+```{r, messages = FALSE}
+pokemon_scatter <- ggplot(all_pokemon, aes(x = weight, y = height))
+pokemon_scatter + geom_point(aes(color = type_1)) + geom_smooth(method = lm) +
+  labs(title = "Relationship between Weight and Height of Pokemon\n(Gen. 1 and 2)",
+       x = 'Weight', y = 'Height', 
+       color = 'Primary Type')
+```
+
+We can see that up until about the 2000 mark for Weight, the correlation is very linear! After that, those pesky Rock and Steel type pokemon seem to throw things off. 
+
+In order to relate height and weight in a quick way, we can create a `BMI` variable (weight/height^2) using the `mutate()` function from the `tidyverse`. 
+
+While we are at it, we can examine the mean, median, and standard deviation of `weight`, `height`, and our new variable `BMI` across each primary type of Pokémon. 
 
 ```{r}
 # Numerical summary for average weight of pokemon by type, creating a
@@ -437,36 +508,17 @@ all_pokemon %>% group_by(type_1) %>% select(type_1, weight, height) %>%
             AvgBMI = mean(bmi), SdBMI = sd(bmi), MedianBMI = median(bmi))
 ```
 
+There are a ton of great tidbits here! 
 
-```{r}
-# Numerical summary for average weight of pokemon by type_1 and type_2
-all_pokemon %>% group_by(type_1) %>% 
-  summarise(AvgWeight = mean(weight), AvgHeight = mean(weight), 
-            AvgAttack = mean(attack), AvgDefense = mean(defense),
-            AvgSpecAttack = mean(spec_attack), 
-            AvgSpecDefense = mean(spec_defense), 
-            AvgSpeed = mean(speed))
-```
+Dragon types appear quite heavy on average, but the median dragon is actually quite light. 
 
-Bar Plot
+Ghost types similarly appear to have a single ghost who is quite heavy, as the median weight is only 5.5, while the mean is a still very light 104.25. 
 
-```{r}
-type_bar <- ggplot(data = all_pokemon, aes( x = type_1))
-type_bar + geom_bar(aes(fill = type_2), position = "dodge") + xlab("1st Type") + ylab("Count") + labs(title = "Barplot of a Pokemon's Primary Type by Secondary Type") +
-  scale_fill_discrete(name = "2nd Type") + theme(axis.text.x = element_text(angle = 45))
-```
+If you were scouting for a basketball team comprised of Pokémon, the median height column might be of use - and Dragon, Fighting, and Ghost types would be at the top of your list. 
 
+Similarly, Ground, Dragon, and Fighting type Pokémon appear to be very dense according to our `BMI` variable. While Ghost types are clock in at a negligible median BMI of 0.105, no surprise there I suppose!
 
-Histogram
-
-```{r}
-type_hist <- ggplot(data = all_pokemon, aes(x = weight))
-type_hist + geom_histogram(fill = "red") + labs(title = "Histogram of Pokemon Weight\n(Pokemon no.1-251)") +
-  xlab("Weight") + ylab("Count")
-```
-
-
-Box Plot
+Were Pokémon denser in the first or second generation of Pokémon? What type of Pokémon are the outliers for `BMI`?
 
 ```{r}
 # Creating plotting item and generating BMI
@@ -482,29 +534,64 @@ bmi_box + geom_boxplot() + geom_jitter(aes(color = type_1), width = 0.3) +
   labs(title = "Boxplot of Pokemon BMI by Generation\n(Gen. 1 and 2)",
        x = "Generation", y = "BMI", color = "Primary Type")
 
-
 ```
 
+Our box plot shows that the BMI's for Generation 1 and Generation 2 seem to be similarly distributed. We can also see that a good number of our outliers appear to be of the Rock or Steel type. 
 
-Scatter Plot
+
+Moving on to Pokémon battle statistics, we can group by type again and check out the averages of the big five - Attack, Defense, Special Attack, Special Defense, and Speed.
 
 ```{r}
-pokemon_scatter <- ggplot(all_pokemon, aes(x = weight, y = height))
-pokemon_scatter + geom_point(aes(color = type_1)) + geom_smooth(method = lm) +
-  labs(title = "Relationship between Weight and Height of Pokemon\n(Gen. 1 and 2)",
-       x = 'Weight', y = 'Height', 
-       color = 'Primary Type')
+# Numerical summary for average weight of pokemon by type_1 and type_2
+all_pokemon %>% group_by(type_1) %>% 
+  summarise(AvgAttack = mean(attack), AvgDefense = mean(defense),
+            AvgSpecAttack = mean(spec_attack), 
+            AvgSpecDefense = mean(spec_defense), 
+            AvgSpeed = mean(speed))
 ```
 
-Berry Analysis
+Dragons and Fighting types seem to dominate with Attack, while Rock and Steel types on average have very high Defense.
+
+For our Special statistics, Ghost and Psychic types are strong in Special Attack, while Pyschics are the only standouts for Special Defense. 
+
+Meanwhile Electric, Ghost and Psychic types are the fastest Pokémon on average. 
+
+
+## Berry Analysis
+
+The PokeAPI has it all, from Pokémon to berries, so let's analyze some berries!
+
+We can start by pulling in a data frame of all berries using `berry(all = TRUE)`.
+
+```{r, message = FALSE, warning= FALSE}
+all_berry <- berry(all = TRUE)
+```
+
+
+Let's start by examining the firmness of the berries. 
+
+```{r}
+berry_hist <- ggplot(data = all_berry, aes(x = firmness))
+berry_hist + geom_histogram(fill = "purple", stat = "count") + labs(title = "Firmness of All Berries by Category") +
+  xlab("Firmness") + ylab("Count")
+```
+
+Of the five firmness levels, hard is the most common with six berries falling into that category, while super-hard is by far the least common with only one.
+
+Perhaps there is a connection between how long it takes a berry to grow, and the size that it grows to, let's find out with a scatter plot. 
 
 ```{r}
 berry_scatter <- ggplot(all_berry, aes(x = size, y = growth_time))
 berry_scatter + geom_point(aes(color = firmness)) + geom_smooth(method = lm) +
-  labs(title = "Association between Size and Growth Time of Berries", x = 'Size', y = 'Growth Time', color = 'Firmness')
+  labs(title = "Association Between Size and Growth Time of Berries", x = 'Size', y = 'Growth Time', color = 'Firmness')
 
 levels(all_berry$firmness)
 ```
+
+Surprisingly nearly every berry appears to take between two to five days to grow, regardless of size. Though it is worth noting that one of the smallest berries actually appears to have by far the longest growth time. 
+
+Finally, let's examine the average flavor profiles of the berries.
+
 
 ```{r}
 # Berry taste profile summary data
@@ -514,9 +601,15 @@ all_berry %>% select(spicy,dry,sweet,bitter,sour) %>%
             AvgSour = mean(sour))
 ```
 
-
+Another surprise - the twenty berries must have been designed to average out to the same value (4.25) across the five flavors! 
 
 ## Conclusion
+
+And that completes our quick tour of the `PokeAPI`. Throughout this vignette I covered a few endpoints that stood out to me - `pokemon`,`habitat`,`color`,`egg-group`, and `berry`, while making functions to assist users in bringing in data and data frames. 
+
+There are numerous other endpoints from the API, it is quite large and the [documentation](https://pokeapi.co/docs/v2) is very thorough if you are interested in learning more or examining other endpoints.
+
+
 
 
 
