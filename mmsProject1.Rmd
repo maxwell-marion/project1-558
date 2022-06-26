@@ -1,11 +1,10 @@
 ---
 title: "Using the PokeAPI"
 author: "Maxwell Marion-Spencer"
-date: '2022-06-18'
-output: html_document
+date: '2022-06-26'
+output: html_document:
+  toc: true
 ---
-
----- ACTUAL REPORT SECTION ----
 
 # Requirements
 
@@ -15,17 +14,19 @@ List of requirements:
 - `httr`
 - `jsonlite`
 
-# Functions
-
-```{r}
-#install.packages("jsonlite")
-#install.packages("httr")
-
+```{r, include = FALSE}
 library(tidyverse)
 library(jsonlite)
 library(httr)
 ```
 
+
+This vignette will highlight some of the many features of the [PokeAPI](https://pokeapi.co/), while also providing a few funtions that may be useful for pulling and analysing data. 
+
+
+
+
+# Functions
 
 ## Function: pokemon
 
@@ -128,13 +129,19 @@ pokemon_df <- function(all = FALSE, last = NULL){
     output_frame <- as.data.frame(t(output_row))
     colnames(output_frame) <- c("name","type_1","type_2","height","weight","hp","attack","defense","spec_attack","spec_defense","speed")
   
-    # Making the numeric variables properly numeric
-    output_frame <- transform(output_frame, height = as.numeric(height),weight = as.numeric(weight),hp = as.numeric(hp), attack = as.numeric(attack), defense =   as.numeric(defense), spec_attack = as.numeric(spec_attack),spec_defense = as.numeric(spec_defense), speed = as.numeric(speed))
-  
   # Adding the stats to the output df
   output_df <- rbind(output_df,output_frame)
   
   }
+  
+  # Making the numeric variables properly numeric
+  output_df <- transform(output_df, height = as.numeric(height),
+                              weight = as.numeric(weight),hp = as.numeric(hp),
+                              attack = as.numeric(attack), 
+                              defense = as.numeric(defense), 
+                              spec_attack = as.numeric(spec_attack),
+                              spec_defense = as.numeric(spec_defense), 
+                              speed = as.numeric(speed))
   
   # Fixing row names and removing extraneous 'starter' row
   output_df <- output_df[-1,]
@@ -148,9 +155,8 @@ pokemon_df <- function(all = FALSE, last = NULL){
 
 
 ```{r}
-# Running pokemon_df on all to save for EDA
-# all_pokemon <- pokemon_df(all = TRUE)
-
+#Running pokemon_df on all to save for EDA
+all_pokemon <- pokemon_df(all = TRUE)
 ```
 
 
@@ -290,6 +296,7 @@ berry <- function(all = NULL, berry = NULL){
       output_df <- output_df[-1,]
       rownames(output_df) <- NULL
       
+      
       # Fixing types of df
       output_df <- transform(output_df, growth_time = as.numeric(growth_time),
                              max_harvest = as.numeric(max_harvest), size = as.numeric(size),
@@ -298,6 +305,11 @@ berry <- function(all = NULL, berry = NULL){
                              sweet = as.numeric(sweet), bitter = as.numeric(bitter),
                              sour = as.numeric(sour))
   
+      # Setting firmness as a factor
+      output_df$firmness <- as.factor(output_df$firmness)
+      levels(output_df$firmness) <- c('very-soft','soft','hard','very-hard','super-hard')
+      
+      
       # Returning our desired data frame
       return(output_df)
   }
@@ -325,6 +337,10 @@ berry <- function(all = NULL, berry = NULL){
                  sweet = as.numeric(sweet), bitter = as.numeric(bitter), 
                  sour = as.numeric(sour))
   
+  # Setting firmness as a factor
+  output_df$firmness <- as.factor(output_df$firmness)
+  levels(output_df$firmness) <- c('very-soft','soft','hard','very-hard','super-hard')
+  
   colnames(output_df) <- output$name
   
   return(output_df)
@@ -333,9 +349,49 @@ berry <- function(all = NULL, berry = NULL){
 ```
 
 
+## Function: egg_group
+
 ```{r}
-test <- berry(all = TRUE)
-test
+egg_group <- function(group){
+  ###
+  # Asks for egg group as an argument and returns all pokemon from that egg 
+  # group
+  #
+  # NOTE: The egg groups are: monster, water1, bug, flying, ground, fairy, plant,
+  #       humanshape, water3, mineral, indeterminate, water2, ditto, dragon, 
+  #       and no-eggs
+  ###
+  
+  # Establishing a group list for input checking
+  egg_list <- c("monster", "water1", "bug", "flying", "ground", "fairy", "plant",
+        "humanshape", "water3", "mineral", "indeterminate", "water2", "ditto",
+        "dragon", "no-eggs")
+  
+  # Implementing a check and error message
+  if(!(group %in% egg_list)){
+    stop("Please pick one of: monster, water1, bug, flying, ground, fairy, plant,
+         humanshape, water3, mineral, indeterminate, water2, ditto, dragon, 
+         or no-eggs")
+  }
+  
+  # Building output
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/egg-group/',group,collapse =","))
+  
+  # Correcting output
+  output_df <- data.frame(output$pokemon_species$name)
+  colnames(output_df) <- c(output$name)
+  
+  # Returning output_df
+  return(output_df)
+  
+}
+```
+
+
+```{r}
+# Creating all berry df for EDA
+all_berry <- berry(all = TRUE)
+#all_berry
 ```
 
 
@@ -371,27 +427,25 @@ table(as.numeric(all_pokemon$height))
 ```
 
 ```{r}
-#– You should create numerical summaries for some quantitative variables at each setting of some of your categorical variables
-#– You should create at least five plots utilizing coloring, grouping, etc. All plots should have nice labels and titles.
-#∗ You should have at least one bar plot, one histogram, one box plot, and one scatter plot
-```
-
-```{r}
-# Numerical summary for average weight of pokemon by type, creating a new variable for 'BMI"
-all_pokemon %>% group_by(type_1) %>% select(type_1, weight, height) %>% mutate(bmi = (as.numeric(weight)/as.numeric(height)^2)) %>%
-  summarise(AvgWeight = mean(as.numeric(weight)), SdWeight = sd(as.numeric(weight)), MedianWeight = median(as.numeric(weight)),AvgHeight = mean(as.numeric(height)), SdHeight = sd(as.numeric(height)), MedianHeight = median(as.numeric(height)), AvgBMI = mean(as.numeric(bmi)), SdBMI = sd(as.numeric(bmi)), MedianBMI = median(as.numeric(bmi)))
+# Numerical summary for average weight of pokemon by type, creating a
+#new variable for 'BMI"
+all_pokemon %>% group_by(type_1) %>% select(type_1, weight, height) %>% 
+  mutate(bmi = weight/(height^2)) %>%
+  summarise(AvgWeight = mean(weight), SdWeight = sd(weight), 
+            MedianWeight = median(weight),AvgHeight = mean(height),
+            SdHeight = sd(height), MedianHeight = median(height),
+            AvgBMI = mean(bmi), SdBMI = sd(bmi), MedianBMI = median(bmi))
 ```
 
 
 ```{r}
 # Numerical summary for average weight of pokemon by type_1 and type_2
 all_pokemon %>% group_by(type_1) %>% 
-  summarise(AvgWeight = mean(as.numeric(weight)), AvgHeight = mean(as.numeric(weight)), AvgAttack = mean(as.numeric(attack)), AvgDefense = mean(as.numeric(defense)), AvgSpecAttack = mean(as.numeric(spec_attack)), AvgSpecDefense = mean(as.numeric(spec_defense)), AvgSpeed = mean(as.numeric(speed)))
-```
-
-```{r}
-#– You should create at least five plots utilizing coloring, grouping, etc. All plots should have nice labels and titles.
-#∗ You should have at least one bar plot, one histogram, one box plot, and one scatter plot
+  summarise(AvgWeight = mean(weight), AvgHeight = mean(weight), 
+            AvgAttack = mean(attack), AvgDefense = mean(defense),
+            AvgSpecAttack = mean(spec_attack), 
+            AvgSpecDefense = mean(spec_defense), 
+            AvgSpeed = mean(speed))
 ```
 
 Bar Plot
@@ -406,7 +460,7 @@ type_bar + geom_bar(aes(fill = type_2), position = "dodge") + xlab("1st Type") +
 Histogram
 
 ```{r}
-type_hist <- ggplot(data = all_pokemon, aes(x = as.numeric(weight)))
+type_hist <- ggplot(data = all_pokemon, aes(x = weight))
 type_hist + geom_histogram(fill = "red") + labs(title = "Histogram of Pokemon Weight\n(Pokemon no.1-251)") +
   xlab("Weight") + ylab("Count")
 ```
@@ -416,7 +470,8 @@ Box Plot
 
 ```{r}
 # Creating plotting item and generating BMI
-bmi_df <- all_pokemon %>% select(name, type_1, weight, height) %>% mutate(bmi = (as.numeric(weight)/as.numeric(height)^2)) %>% mutate(gen = NA)
+bmi_df <- all_pokemon %>% select(name, type_1, weight, height) %>% 
+  mutate(bmi = weight/(height^2)) %>% mutate(gen = NA)
 
 # Establishing gen values
 bmi_df$gen[1:151] <- "1"
@@ -424,7 +479,8 @@ bmi_df$gen[152:251] <- "2"
 
 bmi_box <- ggplot(bmi_df, aes(x = gen, y = bmi))
 bmi_box + geom_boxplot() + geom_jitter(aes(color = type_1), width = 0.3) + 
-  labs(title = "Boxplot of Pokemon BMI by Generation\n(Gen. 1 and 2)", x = "Generation", y = "BMI", color = "Primary Type")
+  labs(title = "Boxplot of Pokemon BMI by Generation\n(Gen. 1 and 2)",
+       x = "Generation", y = "BMI", color = "Primary Type")
 
 
 ```
@@ -433,10 +489,31 @@ bmi_box + geom_boxplot() + geom_jitter(aes(color = type_1), width = 0.3) +
 Scatter Plot
 
 ```{r}
-pokemon_scatter <- ggplot(all_pokemon, aes(x = as.numeric(weight), y = as.numeric(height)))
+pokemon_scatter <- ggplot(all_pokemon, aes(x = weight, y = height))
 pokemon_scatter + geom_point(aes(color = type_1)) + geom_smooth(method = lm) +
-  labs(title = "Association between Weight and Height of Pokemon By Type\n(Gen. 1 and 2)", x = 'Weight', y = 'Height', color = 'Primary Type')
+  labs(title = "Relationship between Weight and Height of Pokemon\n(Gen. 1 and 2)",
+       x = 'Weight', y = 'Height', 
+       color = 'Primary Type')
 ```
+
+Berry Analysis
+
+```{r}
+berry_scatter <- ggplot(all_berry, aes(x = size, y = growth_time))
+berry_scatter + geom_point(aes(color = firmness)) + geom_smooth(method = lm) +
+  labs(title = "Association between Size and Growth Time of Berries", x = 'Size', y = 'Growth Time', color = 'Firmness')
+
+levels(all_berry$firmness)
+```
+
+```{r}
+# Berry taste profile summary data
+all_berry %>% select(spicy,dry,sweet,bitter,sour) %>% 
+  summarise(AvgSpice = mean(spicy), AvgDryness = mean(dry), 
+            AvgSweet = mean(sweet), AvgBitter = mean(bitter), 
+            AvgSour = mean(sour))
+```
+
 
 
 ## Conclusion
