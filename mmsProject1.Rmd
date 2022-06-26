@@ -53,25 +53,39 @@ pokemon <- function(pokemon, stats = TRUE){
   
   # Accounting for the user entering a number rather than a specific Pokémon
   if(is.numeric(pokemon) == TRUE){
-    last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',last,collapse =","))
+    last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',last,
+                                 collapse =","))
     pokemon <- last_test$name
   }
   
   # Getting API output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',pokemon,collapse =","))
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',pokemon,
+                            collapse =","))
   
   # Output if user DOES want to see the battle stat attributes of the pokemon
   if(stats == TRUE){
     
   # Loading the data into a vector
-  output_row <- c(pokemon,  output$types$type$name[1], output$types$type$name[2],output$height,output$weight,      output$stats$base_stat[1],output$stats$base_stat[2],output$stats$base_stat[3],output$stats$base_stat[4],output$stats$base_stat[5],output$stats$base_stat[6])
+  output_row <- c(pokemon,  output$types$type$name[1], output$types$type$name[2],
+                  output$height,output$weight,output$stats$base_stat[1],
+                  output$stats$base_stat[2],output$stats$base_stat[3],
+                  output$stats$base_stat[4],output$stats$base_stat[5],
+                  output$stats$base_stat[6])
   
   # Coercing into a data frame
   output_frame <- as.data.frame(t(output_row))
-  colnames(output_frame) <- c("name","type_1","type_2","height","weight","hp","attack","defense","spec_attack","spec_defense","speed")
+  colnames(output_frame) <- c("name","type_1","type_2","height","weight","hp",
+                              "attack","defense","spec_attack","spec_defense",
+                              "speed")
   
   # Making the numeric variables properly numeric
-  output_frame <- transform(output_frame, height = as.numeric(height),weight = as.numeric(weight),hp = as.numeric(hp), attack = as.numeric(attack), defense = as.numeric(defense), spec_attack = as.numeric(spec_attack),spec_defense = as.numeric(spec_defense), speed = as.numeric(speed))
+  output_frame <- transform(output_frame, height = as.numeric(height),
+                            weight = as.numeric(weight),hp = as.numeric(hp),
+                            attack = as.numeric(attack), 
+                            defense = as.numeric(defense), 
+                            spec_attack = as.numeric(spec_attack),
+                            spec_defense = as.numeric(spec_defense), 
+                            speed = as.numeric(speed))
   
   # Returning a nice data frame
   return(output_frame)
@@ -81,14 +95,16 @@ pokemon <- function(pokemon, stats = TRUE){
   if(stats == FALSE){
     
   # Loading the data into a vector
-  output_row <- c(pokemon, output$types$type$name[1], output$types$type$name[2], output$height, output$weight)
+  output_row <- c(pokemon, output$types$type$name[1], output$types$type$name[2],
+                  output$height, output$weight)
   
   # Coercing into a data frame
   output_frame <- as.data.frame(t(output_row))
   colnames(output_frame) <- c("name","type_1","type_2","height","weight")
   
   # Making the numeric variables properly numeric
-  output_frame <- transform(output_frame, height = as.numeric(height), weight = as.numeric(weight))
+  output_frame <- transform(output_frame, height = as.numeric(height), 
+                            weight = as.numeric(weight))
   
   # Returning a nice data frame
   return(output_frame)
@@ -123,7 +139,8 @@ pokemon_df <- function(all = FALSE, last = NULL){
   
   # Accounting for the user entering a number rather than a specific Pokémon
   if(is.numeric(last) == TRUE){
-     last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',last,collapse =","))
+     last_test <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',
+                                  last,collapse =","))
      last <- last_test$name
   }
   
@@ -140,14 +157,22 @@ pokemon_df <- function(all = FALSE, last = NULL){
   for(n in 1:last){
   
     # Getting API output
-    output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',n,collapse =","))
+    output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon/',n,
+                              collapse =","))
     
     # Loading the data into a vector
-    output_row <- c(output$name,  output$types$type$name[1], output$types$type$name[2],output$height,output$weight,         output$stats$base_stat[1],output$stats$base_stat[2],output$stats$base_stat[3],output$stats$base_stat[4],output$stats$base_stat[5],output$stats$base_stat[6])
+    output_row <- c(output$name,  output$types$type$name[1], 
+                    output$types$type$name[2],output$height,
+                    output$weight,output$stats$base_stat[1],
+                    output$stats$base_stat[2],output$stats$base_stat[3],
+                    output$stats$base_stat[4],output$stats$base_stat[5],
+                    output$stats$base_stat[6])
   
     # Coercing into a data frame
     output_frame <- as.data.frame(t(output_row))
-    colnames(output_frame) <- c("name","type_1","type_2","height","weight","hp","attack","defense","spec_attack","spec_defense","speed")
+    colnames(output_frame) <- c("name","type_1","type_2","height","weight",
+                                "hp","attack","defense","spec_attack",
+                                "spec_defense","speed")
   
   # Adding the stats to the output df
   output_df <- rbind(output_df,output_frame)
@@ -201,7 +226,8 @@ habitat <- function(habitat){
   }
   
   # Building output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-habitat/',habitat,collapse =","))
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-habitat/',
+                            habitat,collapse =","))
   
   # Building output df and naming
   output_df <- data.frame(output$pokemon_species$name)
@@ -245,7 +271,8 @@ color <- function(color){
   }
   
   # Building output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-color/',color,collapse =","))
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/pokemon-color/',
+                            color,collapse =","))
   
   output_df <- data.frame(output$pokemon_species$name)
   colnames(output_df) <- c(color)
@@ -285,7 +312,8 @@ egg_group <- function(group){
   }
   
   # Building output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/egg-group/',group,collapse =","))
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/egg-group/',
+                            group,collapse =","))
   
   # Correcting output
   output_df <- data.frame(output$pokemon_species$name)
@@ -340,17 +368,18 @@ berry <- function(all = NULL, berry = NULL){
       output <- fromJSON(paste0('https://pokeapi.co/api/v2/berry/',n,collapse =","))
     
       # Loading the data into a vector
-      output_row <- c(output$name, output$growth_time, output$max_harvest, output$size, 
-                  output$smoothness, output$soil_dryness, output$firmness$name,
-                  output$flavors$potency[1], output$flavors$potency[2],
-                  output$flavors$potency[3], output$flavors$potency[4],
-                  output$flavors$potency[5])
+      output_row <- c(output$name, output$growth_time, output$max_harvest, 
+                      output$size,output$smoothness, output$soil_dryness, 
+                      output$firmness$name,output$flavors$potency[1], 
+                      output$flavors$potency[2],output$flavors$potency[3],
+                      output$flavors$potency[4],output$flavors$potency[5])
   
       # Coercing into a data frame
       output_frame <- as.data.frame(t(output_row))
-      colnames(output_frame) <- c("name", "growth_time", "max_harvest", "size", "smoothness", 
-                    "soil_dryness", "firmness", "spicy","dry","sweet","bitter",
-                    "sour")
+      colnames(output_frame) <- c("name", "growth_time", "max_harvest",
+                                  "size", "smoothness","soil_dryness", 
+                                  "firmness", "spicy","dry","sweet","bitter",
+                                  "sour")
   
       # Adding the stats to the output df
       output_df <- rbind(output_df,output_frame)
@@ -364,15 +393,19 @@ berry <- function(all = NULL, berry = NULL){
       
       # Fixing types of df
       output_df <- transform(output_df, growth_time = as.numeric(growth_time),
-                             max_harvest = as.numeric(max_harvest), size = as.numeric(size),
-                             smoothness = as.numeric(smoothness), soil_dryness = as.numeric(soil_dryness),
+                             max_harvest = as.numeric(max_harvest), 
+                             size = as.numeric(size),
+                             smoothness = as.numeric(smoothness),
+                             soil_dryness = as.numeric(soil_dryness),
                              spicy = as.numeric(spicy), dry = as.numeric(dry),
-                             sweet = as.numeric(sweet), bitter = as.numeric(bitter),
+                             sweet = as.numeric(sweet), 
+                             bitter = as.numeric(bitter),
                              sour = as.numeric(sour))
   
       # Setting firmness as a factor
       output_df$firmness <- as.factor(output_df$firmness)
-      levels(output_df$firmness) <- c('very-soft','soft','hard','very-hard','super-hard')
+      levels(output_df$firmness) <- c('very-soft','soft',
+                                      'hard','very-hard','super-hard')
       
       
       # Returning our desired data frame
@@ -380,13 +413,14 @@ berry <- function(all = NULL, berry = NULL){
   }
   
   # Building single output
-  output <- fromJSON(paste0('https://pokeapi.co/api/v2/berry/',berry,collapse =","))
+  output <- fromJSON(paste0('https://pokeapi.co/api/v2/berry/',berry,
+                            collapse =","))
   
-  output_row <- c(output$name, output$growth_time, output$max_harvest, output$size, 
-                  output$smoothness, output$soil_dryness, output$firmness$name,
-                  output$flavors$potency[1], output$flavors$potency[2],
-                  output$flavors$potency[3], output$flavors$potency[4],
-                  output$flavors$potency[5])
+  output_row <- c(output$name, output$growth_time, output$max_harvest, 
+                  output$size, output$smoothness, output$soil_dryness,
+                  output$firmness$name, output$flavors$potency[1], 
+                  output$flavors$potency[2],output$flavors$potency[3], 
+                  output$flavors$potency[4],output$flavors$potency[5])
   
   output_names <- c("name", "growth_time", "max_harvest", "size", "smoothness", 
                     "soil_dryness", "firmness", "spicy","dry","sweet","bitter",
@@ -397,14 +431,16 @@ berry <- function(all = NULL, berry = NULL){
   # Fixing types of df
   output_df <- transform(output_df, growth_time = as.numeric(growth_time),
                  max_harvest = as.numeric(max_harvest), size = as.numeric(size),
-                 smoothness = as.numeric(smoothness), soil_dryness = as.numeric(soil_dryness),
+                 smoothness = as.numeric(smoothness), 
+                 soil_dryness = as.numeric(soil_dryness),
                  spicy = as.numeric(spicy), dry = as.numeric(dry),
                  sweet = as.numeric(sweet), bitter = as.numeric(bitter), 
                  sour = as.numeric(sour))
   
   # Setting firmness as a factor
   output_df$firmness <- as.factor(output_df$firmness)
-  levels(output_df$firmness) <- c('very-soft','soft','hard','very-hard','super-hard')
+  levels(output_df$firmness) <- c('very-soft','soft','hard','very-hard',
+                                  'super-hard')
   
   colnames(output_df) <- output$name
   
@@ -457,8 +493,11 @@ Let's examine this information in graph form.
 
 ```{r}
 type_bar <- ggplot(data = all_pokemon, aes( x = type_1))
-type_bar + geom_bar(aes(fill = type_2), position = "dodge") + xlab("1st Type") + ylab("Count") + labs(title = "Barplot of a Pokemon's Primary Type by Secondary Type") +
-  scale_fill_discrete(name = "2nd Type") + theme(axis.text.x = element_text(angle = 45))
+type_bar + geom_bar(aes(fill = type_2), position = "dodge") + 
+  xlab("1st Type") + ylab("Count") + 
+  labs(title = "Barplot of a Pokemon's Primary Type by Secondary Type") +
+  scale_fill_discrete(name = "2nd Type") + theme(axis.text.x = 
+                                                   element_text(angle = 45))
 ```
 
 From this bar plot we can see that Fighting type Pokémon have no individuals with secondary types, while Water, Rock, and Bug types are fairly diverse. We are also able to see that what we learned before - that the majority of Pokémon have no secondary type seems to bear out quiet clearly, with the highest bars in many cases representing the 'NA' secondary type. 
@@ -478,7 +517,8 @@ Similarly, a histogram confirms that the case with weight is very similar.
 
 ```{r}
 type_hist <- ggplot(data = all_pokemon, aes(x = weight))
-type_hist + geom_histogram(fill = "red", bins = 100) + labs(title = "Histogram of Pokemon Weight\n(Pokemon no.1-251)") +
+type_hist + geom_histogram(fill = "red", bins = 100) 
++ labs(title = "Histogram of Pokemon Weight\n(Pokemon no.1-251)") +
   xlab("Weight") + ylab("Count")
 ```
 
@@ -584,7 +624,8 @@ Perhaps there is a connection between how long it takes a berry to grow, and the
 ```{r}
 berry_scatter <- ggplot(all_berry, aes(x = size, y = growth_time))
 berry_scatter + geom_point(aes(color = firmness)) + geom_smooth(method = lm) +
-  labs(title = "Association Between Size and Growth Time of Berries", x = 'Size', y = 'Growth Time', color = 'Firmness')
+  labs(title = "Association Between Size and Growth Time of Berries", 
+       x = 'Size', y = 'Growth Time', color = 'Firmness')
 
 levels(all_berry$firmness)
 ```
