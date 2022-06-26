@@ -541,25 +541,45 @@ types_table
 ```
 
     ##           
-    ##            dark dragon electric fairy fighting fire flying grass ground ice poison psychic rock steel water Sum
-    ##   bug         0      0        0     0        1    0      5     2      0   0      7       0    1     2     0  18
-    ##   dark        0      0        0     0        0    2      1     0      0   1      0       0    0     0     0   4
-    ##   dragon      0      0        0     0        0    0      1     0      0   0      0       0    0     0     0   1
-    ##   electric    0      0        0     0        0    0      1     0      0   0      0       0    0     2     0   3
-    ##   fairy       0      0        0     0        0    0      1     0      0   0      0       0    0     0     0   1
-    ##   fighting    0      0        0     0        0    0      0     0      0   0      0       0    0     0     0   0
-    ##   fire        0      0        0     0        0    0      3     0      0   0      0       0    1     0     0   4
-    ##   ghost       0      0        0     0        0    0      0     0      0   0      3       0    0     0     0   3
-    ##   grass       0      0        0     0        0    0      3     0      0   0      9       2    0     0     0  14
-    ##   ground      0      0        0     0        0    0      1     0      0   0      0       0    2     0     0   3
-    ##   ice         0      0        0     0        0    0      2     0      2   0      0       2    0     0     0   6
-    ##   normal      0      0        0     3        0    0     10     0      0   0      0       1    0     0     0  14
-    ##   poison      0      0        0     0        0    0      3     0      2   0      0       0    0     0     0   5
-    ##   psychic     0      0        0     1        0    0      3     1      0   0      0       0    0     0     0   5
-    ##   rock        1      0        0     0        0    0      1     0      6   0      0       0    0     0     4  12
-    ##   steel       0      0        0     0        0    0      1     0      1   0      0       0    0     0     0   2
-    ##   water       0      1        2     2        1    0      2     0      2   3      3       4    1     0     0  21
-    ##   Sum         1      1        2     6        2    2     38     3     13   4     22       9    5     4     4 116
+    ##            dark dragon electric fairy fighting fire flying grass ground ice poison psychic rock steel water
+    ##   bug         0      0        0     0        1    0      5     2      0   0      7       0    1     2     0
+    ##   dark        0      0        0     0        0    2      1     0      0   1      0       0    0     0     0
+    ##   dragon      0      0        0     0        0    0      1     0      0   0      0       0    0     0     0
+    ##   electric    0      0        0     0        0    0      1     0      0   0      0       0    0     2     0
+    ##   fairy       0      0        0     0        0    0      1     0      0   0      0       0    0     0     0
+    ##   fighting    0      0        0     0        0    0      0     0      0   0      0       0    0     0     0
+    ##   fire        0      0        0     0        0    0      3     0      0   0      0       0    1     0     0
+    ##   ghost       0      0        0     0        0    0      0     0      0   0      3       0    0     0     0
+    ##   grass       0      0        0     0        0    0      3     0      0   0      9       2    0     0     0
+    ##   ground      0      0        0     0        0    0      1     0      0   0      0       0    2     0     0
+    ##   ice         0      0        0     0        0    0      2     0      2   0      0       2    0     0     0
+    ##   normal      0      0        0     3        0    0     10     0      0   0      0       1    0     0     0
+    ##   poison      0      0        0     0        0    0      3     0      2   0      0       0    0     0     0
+    ##   psychic     0      0        0     1        0    0      3     1      0   0      0       0    0     0     0
+    ##   rock        1      0        0     0        0    0      1     0      6   0      0       0    0     0     4
+    ##   steel       0      0        0     0        0    0      1     0      1   0      0       0    0     0     0
+    ##   water       0      1        2     2        1    0      2     0      2   3      3       4    1     0     0
+    ##   Sum         1      1        2     6        2    2     38     3     13   4     22       9    5     4     4
+    ##           
+    ##            Sum
+    ##   bug       18
+    ##   dark       4
+    ##   dragon     1
+    ##   electric   3
+    ##   fairy      1
+    ##   fighting   0
+    ##   fire       4
+    ##   ghost      3
+    ##   grass     14
+    ##   ground     3
+    ##   ice        6
+    ##   normal    14
+    ##   poison     5
+    ##   psychic    5
+    ##   rock      12
+    ##   steel      2
+    ##   water     21
+    ##   Sum      116
 
 Let’s examine this information in graph form.
 
