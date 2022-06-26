@@ -653,8 +653,6 @@ pokemon_scatter + geom_point(aes(color = type_1)) + geom_smooth(method = lm) +
        color = 'Primary Type')
 ```
 
-    ## `geom_smooth()` using formula 'y ~ x'
-
 ![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 We can see that up until about the 2000 mark for Weight, the correlation
@@ -822,7 +820,6 @@ berry_scatter + geom_point(aes(color = firmness)) + geom_smooth(method = lm) +
        x = 'Size', y = 'Growth Time', color = 'Firmness')
 ```
 
-    ## `geom_smooth()` using formula 'y ~ x'
 
 ![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
