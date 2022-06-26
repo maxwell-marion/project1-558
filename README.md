@@ -806,8 +806,6 @@ berry_hist + geom_histogram(fill = "purple", stat = "count") + labs(title = "Fir
   xlab("Firmness") + ylab("Count")
 ```
 
-    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
-
 ![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 Of the five firmness levels, hard is the most common with six berries
